@@ -20,6 +20,8 @@ def send(event=None):  # event is passed by binders.
     msg = my_msg.get()
     my_msg.set("")  # Clears input field.
     client_socket.send(bytes(msg, "utf8"))
+    if "/" in msg:
+        send_file(msg)
     if msg == "{quit}":
         client_socket.close()
         top.quit()
@@ -30,12 +32,27 @@ def on_closing(event=None):
     my_msg.set("{quit}")
     send()
 
+
+def send_file(path):
+    file = open(path, "r")
+    msg = file.readline()
+    while msg:
+        client_socket.send(bytes(msg, "utf8"))
+        msg = file.readline()
+    file.close()
+
+
+def receive_file(msg):
+    file = open("new.txt", "w")
+    file.write(msg)
+    file.close()
+
+
 top = tkinter.Tk()
 top.title("Chatter")
 
 messages_frame = tkinter.Frame(top)
 my_msg = tkinter.StringVar()  # For the messages to be sent.
-my_msg.set("Type your messages here.")
 scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
 # Following will contain the messages.
 msg_list = tkinter.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
