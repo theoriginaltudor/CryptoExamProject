@@ -3,12 +3,14 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
+import os
 
 
 def receive():
     """Handles receiving of messages."""
     while True:
         try:
+
             msg = client_socket.recv(BUFSIZ).decode("utf8")
             msg_list.insert(tkinter.END, msg)
         except OSError:  # Possibly client has left the chat.
@@ -34,18 +36,29 @@ def on_closing(event=None):
 
 
 def send_file(path):
-    file = open(path, "r")
-    msg = file.readline()
-    while msg:
-        client_socket.send(bytes(msg, "utf8"))
-        msg = file.readline()
-    file.close()
+    f = open('file.txt', 'rb')
+    l = f.read(1024)
+    while l:
+        print("sending file...")
+        client_socket.send(l)
+        l = f.read(1024)
+    f.close()
+    print("Done sending")
+    client_socket.shutdown(socket.SHUT_WR)
+    client_socket.close()
+
 
 
 def receive_file(msg):
-    file = open("new.txt", "w")
-    file.write(msg)
-    file.close()
+    f = open('torecv.txt', 'wb')
+    l = client_socket.recv(1024)
+    while l:
+        print("Receiving...")
+        f.write(l)
+        l = client_socket.recv(1024)
+    f.close()
+    print("Done receiving")
+    client_socket.close()
 
 
 top = tkinter.Tk()
@@ -79,6 +92,7 @@ else:
 
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
+
 
 client_socket = socket(AF_INET, SOCK_STREAM)
 client_socket.connect(ADDR)
