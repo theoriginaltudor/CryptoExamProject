@@ -34,7 +34,7 @@ def on_closing(event=None):
 
 
 def send_file(path):
-    file = open(path, "r")
+    file = open('file.txt', "r")
     msg = file.readline()
     while msg:
         client_socket.send(bytes(msg, "utf8"))
