@@ -7,12 +7,21 @@ import tkinter
 
 def receive():
     """Handles receiving of messages."""
+
     while True:
         try:
             msg = client_socket.recv(BUFSIZ).decode("utf8")
             msg_list.insert(tkinter.END, msg)
+
         except OSError:  # Possibly client has left the chat.
             break
+
+    while (msg):
+        f = open("received.txt", "w")
+        print("We just created the new file to be written")
+        f.write(msg)
+        msg.recv(BUFSIZ)
+        f.close()
 
 
 def send(event=None):  # event is passed by binders.
@@ -20,7 +29,7 @@ def send(event=None):  # event is passed by binders.
     msg = my_msg.get()
     my_msg.set("")  # Clears input field.
     client_socket.send(bytes(msg, "utf8"))
-    if "/" in msg:
+    if "\\" in msg:
         send_file(msg)
     if msg == "{quit}":
         client_socket.close()
@@ -34,17 +43,13 @@ def on_closing(event=None):
 
 
 def send_file(path):
-    file = open('file.txt', "r")
+    #  file = input(open("Insert file path: "))
+    file = open('C:\\Users\\BurimSyla\\PycharmProjects\\CryptoExamProject\\Server-Client Testing\\filenew.txt', "r")
+
     msg = file.readline()
     while msg:
         client_socket.send(bytes(msg, "utf8"))
         msg = file.readline()
-    file.close()
-
-
-def receive_file(msg):
-    file = open("new.txt", "w")
-    file.write(msg)
     file.close()
 
 

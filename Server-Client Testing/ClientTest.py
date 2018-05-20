@@ -16,4 +16,4 @@ f.close()
 print = "Done Sending"
 s.shutdown(socket.SHUT_WR)
 print = s.recv(1024)
-s.close                     # Close the socket when done
+s.close     # Close the socket when done

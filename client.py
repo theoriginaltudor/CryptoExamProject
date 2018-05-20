@@ -46,7 +46,6 @@ def checkForSignature():
     f = open("verifyingKey.txt", "r")
 
 
-
 def getSignatureKey(msg):
     global verifying_key_external
     someString, vk_hex = msg.split("{")
