@@ -1,14 +1,11 @@
 import socket  # Import socket module
 import nacl.secret
 from nacl.encoding import HexEncoder
-from nacl.public import PrivateKey, SealedBox
+from nacl.public import PrivateKey, Box, PublicKey
 
 sk = PrivateKey.generate()
 pk = sk.public_key
-print(pk)
 pkencoded = pk.encode(HexEncoder)
-print(pkencoded)
-unsealing_box = SealedBox(sk)
 
 s = socket.socket()         # Create a socket object
 host = socket.gethostname() # Get local machine name
@@ -20,9 +17,11 @@ while True:
     c, addr = s.accept()     # Establish connection with client.
     print("Got connection from", addr)
     c.send(pkencoded)
+    pk_external = c.recv(1024)
+    loaded_public_key = PublicKey(pk_external, encoder=HexEncoder)
+    boxAsymmetric = Box(sk, loaded_public_key)
     message = c.recv(1024)
-    plain_text = unsealing_box.decrypt(message)
-    print("Symmetric key: ", plain_text)
+    plain_text = boxAsymmetric.decrypt(message)
     box = nacl.secret.SecretBox(plain_text)
 
     print("Receiving...")
