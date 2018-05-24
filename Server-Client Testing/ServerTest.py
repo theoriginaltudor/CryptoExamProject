@@ -32,5 +32,5 @@ while True:
         l = box.decrypt(c.recv(1024))
     f.close()
     print("Done Receiving")
-    c.send(b"Thank you for connection")
+    c.send(box.encrypt(b"Thank you for connection"))
     c.close()                # Close the connection
